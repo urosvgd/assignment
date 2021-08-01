@@ -1,8 +1,12 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moja_garaza/bloc/cars_bloc.dart';
 import 'package:moja_garaza/theme.dart';
 import 'package:flutter/material.dart';
 
 import 'models/car.dart' as car;
 import 'models/car.dart';
+
+import './repository/cars_repository.dart';
 
 enum SearchOptions { model, color }
 
@@ -35,18 +39,36 @@ class _GaragePageState extends State<GaragePage> {
         title: Text("Garaza"),
       ),
       backgroundColor: blackColor,
-      body: Padding(
-        padding: const EdgeInsets.only(top: 30.0, left: 30, right: 30),
-        child: Container(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              searchField(),
-              pickCategory(),
-              buildList(),
-            ],
-          ),
+      body: BlocProvider(
+        create: (context) => CarsBloc(FakeCarsRepository())..add(GetCars()),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 30.0, left: 30, right: 30),
+          child: Container(child: BlocBuilder<CarsBloc, CarsState>(
+            builder: (context, state) {
+              if (state is CarsLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (state is CarsLoaded) {
+                print(state.cars[0]);
+                return Center(child: Text("Yay!!! Fetched1", style: TextStyle(color: Colors.white)));
+              }
+              if(state is CarsError) {
+                return Center(child: Text("This should not happen something is wrong !!", style: TextStyle(color: Colors.white)));
+              }
+              return Container();
+            },
+          )
+              // child: Column(
+              //   mainAxisSize: MainAxisSize.max,
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     searchField(),
+              //     pickCategory(),
+              //     buildList(),
+              //   ],
+              // ),
+
+              ),
         ),
       ),
     );
