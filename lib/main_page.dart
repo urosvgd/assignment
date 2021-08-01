@@ -1,48 +1,76 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:moja_garaza/models/car.dart' as car;
-import 'package:moja_garaza/theme.dart';
 import 'package:moja_garaza/widgets/custom_button.dart';
+import 'package:moja_garaza/widgets/user_info.dart';
 
 class MainPage extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
-    print(car.cars[0]);
     return Scaffold(
-      backgroundColor: blackColor,
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              padding: EdgeInsets.all(50),
-              color: greyColor2,
-              child: Column(
-                children: [
-                  Text(
-                    "Noob",
-                    style: TextStyle(color: blackColor),
-                  )
-                ],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+      ),
+      body: ListView(
+        physics: BouncingScrollPhysics(),
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              UserInfo(
+                imagePath: ("assets/images/user_icon.png"),
+                onClicked: () async {},
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [],
-                ),
+              buildName("Uros", "Jovicic"),
+              SizedBox(height: 24),
+              Divider(
+                height: 50,
+                thickness: 3,
               ),
-            ),
-            navigateToGarage(context),
-          ],
-        ),
+              SizedBox(height: 48),
+              buildAbout("Brace Ribnikar", "Brace Ribnikar"),
+              Divider(
+                height: 150,
+              ),
+              navigateToGarage(context)
+            ],
+          ),
+        ],
       ),
     );
   }
 
+  Widget buildName(firstName, lastName) => Column(
+        children: [
+          Text(
+            "Ime: $firstName",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Prezime: $lastName",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          )
+        ],
+      );
+
+  Widget buildAbout(address, garageAddress) => Container(
+        padding: EdgeInsets.symmetric(horizontal: 48),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adresa garaze: $garageAddress',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Adresa stanovanja: $address",
+              style: TextStyle(fontSize: 16, height: 1.4),
+            ),
+          ],
+        ),
+      );
   Widget navigateToGarage(context) {
     return Expanded(
       flex: 0,

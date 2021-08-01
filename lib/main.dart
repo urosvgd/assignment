@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.grey,
       ),
       onGenerateRoute: RouteGenerator.generateRoute,
-      initialRoute: '/garage',
+      initialRoute: '/',
       home: MainPage(),
     );
   }
