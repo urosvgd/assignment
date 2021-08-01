@@ -25,7 +25,7 @@ class _GaragePageState extends State<GaragePage> {
   late List<Car> _list;
   late bool _isSearching;
   String _searchText = "";
-  List searchresult = [];
+  List searchResult = [];
 
   void initState() {
     super.initState();
@@ -39,188 +39,143 @@ class _GaragePageState extends State<GaragePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(searchresult);
     return Scaffold(
       appBar: AppBar(
         title: Text("Auta"),
       ),
       backgroundColor: blackColor,
-      body: Column(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: _controller,
-                onSubmitted: searchOperation,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search, color: Colors.white),
-                  hintText: "Search...",
-                  hintStyle: TextStyle(color: Colors.white),
-                ),
+      body: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _controller,
+              onSubmitted: _runFilter,
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search, color: Colors.white),
+                hintText: "Search...",
+                hintStyle: TextStyle(color: Colors.white),
               ),
-              Column(
-                children: [
-                  ListTile(
-                    title: const Text('Model'),
-                    leading: Radio<SearchOptions>(
-                      value: SearchOptions.model,
-                      groupValue: _options,
-                      onChanged: (SearchOptions? value) {
-                        setState(() {
-                          _options = value;
-                        });
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('Color'),
-                    leading: Radio<SearchOptions>(
-                      value: SearchOptions.color,
-                      groupValue: _options,
-                      onChanged: (SearchOptions? value) {
-                        setState(() {
-                          _options = value;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-          Expanded(
-            child: ListView(
+            ),
+            Column(
               children: [
-                Container(
-                  margin: EdgeInsets.only(left: 31, bottom: 21, top: 20),
-                  child: Text(
-                    'Vasa vozila',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                ListTile(
+                  title: const Text('Model'),
+                  leading: Radio<SearchOptions>(
+                    value: SearchOptions.model,
+                    groupValue: _options,
+                    onChanged: (SearchOptions? value) {
+                      setState(() {
+                        _options = value;
+                      });
+                    },
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailPage(),
-                      ),
-                    );
-                  },
-                  child: Expanded(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                      child: ListView.builder(
-                          itemCount: _list.length,
-                          itemBuilder: (BuildContext context, index) {
-                            return buildCarCard(_list, index);
-                          }),
-                    ),
+                ListTile(
+                  title: const Text('Color'),
+                  leading: Radio<SearchOptions>(
+                    value: SearchOptions.color,
+                    groupValue: _options,
+                    onChanged: (SearchOptions? value) {
+                      setState(() {
+                        _options = value;
+                      });
+                    },
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildCarCard(carList, int index) {
-    return Card(
-      child: Container(
-        height: 100,
-        color: blackColor,
-        child: Row(
-          children: [
-            Center(
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Icon(Icons.car_rental_rounded),
-              ),
-            ),
             Expanded(
-              child: Container(
-                alignment: Alignment.topLeft,
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: ListTile(
-                        isThreeLine: true,
-                        title:
-                            Text("Proizvodnja: ${carList[index].carProducer}"),
-                        subtitle: Text("Model ${carList[index].carModel}"),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text("Boja: ${carList[index].color}"),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text("Reg.Br.: ${carList[index].plateNumber}"),
-                          SizedBox(
-                            height: 100,
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              flex: 8,
+              child: ListView.builder(
+                  physics: ScrollPhysics(),
+                  itemCount: searchResult.length > 0
+                      ? searchResult.length
+                      : _list.length,
+                  itemBuilder: (BuildContext context, index) {
+                    if (searchResult.length > 0) {
+                      return buildCarCard(searchResult, index);
+                    } else {
+                      return buildCarCard(_list, index);
+                    }
+                  }),
             ),
           ],
         ),
       ),
-      elevation: 8,
-      margin: EdgeInsets.all(10),
     );
   }
 
-  void _handleSearchStart() {
-    setState(() {
-      _isSearching = true;
-    });
-  }
-
-  void _handleSearchEnd() {
-    setState(() {
-      this.icon = Icon(
-        Icons.search,
-        color: Colors.white,
+  Widget buildCarCard(list, index) => Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Proizvodjac: ${list[index].carProducer}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Model: ${list[index].carModel}',
+                style: TextStyle(fontSize: 20),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    "Boja: ${list[index].color}",
+                    style: TextStyle(fontSize: 20),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    "Registarski broj: ${list[index].plateNumber}",
+                    style: TextStyle(fontSize: 20),
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
       );
-      _isSearching = false;
-      _controller.clear();
-    });
-  }
 
-  void searchOperation(String searchText) {
-    searchresult.clear();
-    for (int i = 0; i < _list.length; i++) {
-      if (_options == SearchOptions.model) {
-        String data = _list[i].carModel;
-
-        if (data.toLowerCase().contains(searchText.toLowerCase())) {
-          searchresult.add(data);
-        }
-      }
-
+  void _runFilter(String enteredKeyword) {
+    var results = [];
+    if (enteredKeyword.isEmpty) {
+      // if the search field is empty or only contains white-space, we'll display all users
+      results = _list;
+    } else {
       if (_options == SearchOptions.color) {
-        String data = _list[i].color;
-
-        if (data.toLowerCase().contains(searchText.toLowerCase())) {
-          searchresult.add(data);
-        }
+        results = _list
+            .where((car) =>
+                car.color.toLowerCase().contains(enteredKeyword.toLowerCase()))
+            .toList();
       }
+      if (_options == SearchOptions.model) {
+        results = _list
+            .where((car) => car.carModel
+                .toLowerCase()
+                .contains(enteredKeyword.toLowerCase()))
+            .toList();
+      }
+      // we use the toLowerCase() method to make it case-insensitive
     }
+
+    // Refresh the UI
+    setState(() {
+      searchResult = results;
+    });
   }
 }
