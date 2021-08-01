@@ -1,5 +1,3 @@
-// import 'package:moja_garaza/detail_page.dart';
-import 'package:moja_garaza/detail_page.dart';
 import 'package:moja_garaza/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -16,20 +14,13 @@ class GaragePage extends StatefulWidget {
 class _GaragePageState extends State<GaragePage> {
   SearchOptions? _options = SearchOptions.model;
 
-  Icon icon = Icon(
-    Icons.search,
-    color: Colors.white,
-  );
-  final globalKey = GlobalKey<ScaffoldState>();
   final TextEditingController _controller = TextEditingController();
   late List<Car> _list;
-  late bool _isSearching;
-  String _searchText = "";
+
   List searchResult = [];
 
   void initState() {
     super.initState();
-    _isSearching = false;
     values();
   }
 
@@ -41,66 +32,84 @@ class _GaragePageState extends State<GaragePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Auta"),
+        title: Text("Garaza"),
       ),
       backgroundColor: blackColor,
-      body: Container(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _controller,
-              onSubmitted: _runFilter,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search, color: Colors.white),
-                hintText: "Search...",
-                hintStyle: TextStyle(color: Colors.white),
-              ),
-            ),
-            Column(
-              children: [
-                ListTile(
-                  title: const Text('Model'),
-                  leading: Radio<SearchOptions>(
-                    value: SearchOptions.model,
-                    groupValue: _options,
-                    onChanged: (SearchOptions? value) {
-                      setState(() {
-                        _options = value;
-                      });
-                    },
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Color'),
-                  leading: Radio<SearchOptions>(
-                    value: SearchOptions.color,
-                    groupValue: _options,
-                    onChanged: (SearchOptions? value) {
-                      setState(() {
-                        _options = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: ListView.builder(
-                  physics: ScrollPhysics(),
-                  itemCount: searchResult.length > 0
-                      ? searchResult.length
-                      : _list.length,
-                  itemBuilder: (BuildContext context, index) {
-                    if (searchResult.length > 0) {
-                      return buildCarCard(searchResult, index);
-                    } else {
-                      return buildCarCard(_list, index);
-                    }
-                  }),
-            ),
-          ],
+      body: Padding(
+        padding: const EdgeInsets.only(top: 30.0, left: 30, right: 30),
+        child: Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              searchField(),
+              pickCategory(),
+              buildList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Expanded buildList() {
+    return Expanded(
+      child: ListView.builder(
+          physics: ScrollPhysics(),
+          itemCount:
+              searchResult.length > 0 ? searchResult.length : _list.length,
+          itemBuilder: (BuildContext context, index) {
+            if (searchResult.length > 0) {
+              return buildCarCard(searchResult, index);
+            } else {
+              return buildCarCard(_list, index);
+            }
+          }),
+    );
+  }
+
+  Column pickCategory() {
+    return Column(
+      children: [
+        ListTile(
+          title: const Text('Model'),
+          leading: Radio<SearchOptions>(
+            value: SearchOptions.model,
+            groupValue: _options,
+            onChanged: (SearchOptions? value) {
+              setState(() {
+                _options = value;
+              });
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text('Boja'),
+          leading: Radio<SearchOptions>(
+            value: SearchOptions.color,
+            groupValue: _options,
+            onChanged: (SearchOptions? value) {
+              setState(() {
+                _options = value;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  TextField searchField() {
+    return TextField(
+      controller: _controller,
+      onSubmitted: _runFilter,
+      decoration: InputDecoration(
+        prefixIcon: Icon(Icons.search, color: Colors.white),
+        hintText: "Pretraga...",
+        hintStyle: TextStyle(color: Colors.white),
+        suffixIcon: IconButton(
+          onPressed: _controller.clear,
+          icon: Icon(Icons.clear),
         ),
       ),
     );
@@ -177,5 +186,7 @@ class _GaragePageState extends State<GaragePage> {
     setState(() {
       searchResult = results;
     });
+
+    enteredKeyword = "";
   }
 }

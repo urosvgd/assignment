@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:moja_garaza/widgets/car_numbers.dart';
 import 'package:moja_garaza/widgets/custom_button.dart';
 import 'package:moja_garaza/widgets/user_info.dart';
+import 'package:moja_garaza/models/car.dart' as car;
 
 class MainPage extends StatelessWidget {
   @override
@@ -23,6 +25,7 @@ class MainPage extends StatelessWidget {
               ),
               buildName("Uros", "Jovicic"),
               SizedBox(height: 24),
+              CarNumbers(carNumbers: car.cars.length),
               Divider(
                 height: 50,
                 thickness: 3,
@@ -55,18 +58,32 @@ class MainPage extends StatelessWidget {
       );
 
   Widget buildAbout(address, garageAddress) => Container(
-        padding: EdgeInsets.symmetric(horizontal: 48),
+        padding: EdgeInsets.symmetric(horizontal: 38),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Adresa garaze: $garageAddress',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Icon(Icons.garage_sharp),
+                Text(
+                  'Adresa garaze: $garageAddress',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              "Adresa stanovanja: $address",
-              style: TextStyle(fontSize: 16, height: 1.4),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(Icons.house_sharp),
+                Text(
+                  "Adresa stanovanja: $address",
+                  overflow: TextOverflow.fade,
+                  maxLines: 2,
+                  softWrap: false,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ],
         ),
