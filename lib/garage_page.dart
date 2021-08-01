@@ -163,7 +163,7 @@ class _GaragePageState extends State<GaragePage> {
   void _runFilter(String enteredKeyword) {
     var results = [];
     if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
+      // if the search field is empty or only contains white-space, we'll display all cars
       results = _list;
     } else {
       if (_options == SearchOptions.color) {

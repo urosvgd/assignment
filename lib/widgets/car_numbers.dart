@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CarNumbers extends StatelessWidget {
-  int? carNumbers;
+  final int? carNumbers;
   CarNumbers({ this.carNumbers });
   @override
   Widget build(BuildContext context) => Row(
