@@ -17,20 +17,15 @@ class GaragePage extends StatefulWidget {
 
 class _GaragePageState extends State<GaragePage> {
   SearchOptions? _options = SearchOptions.model;
-
   final TextEditingController _controller = TextEditingController();
-  late List<Car> _list;
 
   List searchResult = [];
 
   void initState() {
     super.initState();
-    values();
   }
 
-  void values() {
-    _list = car.cars;
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +45,20 @@ class _GaragePageState extends State<GaragePage> {
               }
               if (state is CarsLoaded) {
                 print(state.cars[0]);
-                return Center(child: Text("Yay!!! Fetched1", style: TextStyle(color: Colors.white)));
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    searchField(),
+                    pickCategory(),
+                    buildList(state.cars),
+                  ],
+                );
               }
-              if(state is CarsError) {
-                return Center(child: Text("This should not happen something is wrong !!", style: TextStyle(color: Colors.white)));
+              if (state is CarsError) {
+                return Center(
+                    child: Text("This should not happen something is wrong !!",
+                        style: TextStyle(color: Colors.white)));
               }
               return Container();
             },
@@ -74,17 +79,17 @@ class _GaragePageState extends State<GaragePage> {
     );
   }
 
-  Expanded buildList() {
+  Expanded buildList(List cars) {
     return Expanded(
       child: ListView.builder(
           physics: ScrollPhysics(),
           itemCount:
-              searchResult.length > 0 ? searchResult.length : _list.length,
+              searchResult.length > 0 ? searchResult.length : cars.length,
           itemBuilder: (BuildContext context, index) {
             if (searchResult.length > 0) {
               return buildCarCard(searchResult, index);
             } else {
-              return buildCarCard(_list, index);
+              return buildCarCard(cars, index);
             }
           }),
     );
@@ -137,65 +142,67 @@ class _GaragePageState extends State<GaragePage> {
     );
   }
 
-  Widget buildCarCard(list, index) => Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+  Widget buildCarCard(list, index) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Proizvodjac: ${list[index].carProducer}',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Model: ${list[index].carModel}',
+              style: TextStyle(fontSize: 20),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "Boja: ${list[index].color}",
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "Registarski broj: ${list[index].plateNumber}",
+                  style: TextStyle(fontSize: 20),
+                )
+              ],
+            ),
+          ],
         ),
-        child: Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Proizvodjac: ${list[index].carProducer}',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Model: ${list[index].carModel}',
-                style: TextStyle(fontSize: 20),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    "Boja: ${list[index].color}",
-                    style: TextStyle(fontSize: 20),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    "Registarski broj: ${list[index].plateNumber}",
-                    style: TextStyle(fontSize: 20),
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
+      ),
+    );
+  }
 
   void _runFilter(String enteredKeyword) {
     var results = [];
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
-      results = _list;
+      results = cars;
     } else {
       if (_options == SearchOptions.color) {
-        results = _list
+        results = cars
             .where((car) =>
                 car.color.toLowerCase().contains(enteredKeyword.toLowerCase()))
             .toList();
       }
       if (_options == SearchOptions.model) {
-        results = _list
+        results = cars
             .where((car) => car.carModel
                 .toLowerCase()
                 .contains(enteredKeyword.toLowerCase()))
