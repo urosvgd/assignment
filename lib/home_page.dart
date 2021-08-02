@@ -1,13 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:moja_garaza/repository/cars_repository.dart';
 import 'package:moja_garaza/widgets/car_numbers.dart';
 import 'package:moja_garaza/widgets/custom_button.dart';
 import 'package:moja_garaza/widgets/user_info.dart';
-import 'package:moja_garaza/models/car.dart' as car;
 
-class MainPage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int carNumber = 0;
+
   @override
   Widget build(BuildContext context) {
+    FakeCarsRepository().fetchCars().then((value) => setState(() {
+          carNumber = value.length;
+        }));
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -25,7 +35,7 @@ class MainPage extends StatelessWidget {
               ),
               buildName("Uros", "Jovicic"),
               SizedBox(height: 24),
-              CarNumbers(carNumbers: car.cars.length),
+              CarNumbers(carNumbers: carNumber),
               Divider(
                 height: 50,
                 thickness: 3,
@@ -88,6 +98,7 @@ class MainPage extends StatelessWidget {
           ],
         ),
       );
+
   Widget navigateToGarage(context) {
     return Expanded(
       flex: 0,

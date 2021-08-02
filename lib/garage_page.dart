@@ -1,11 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moja_garaza/bloc/cars_bloc.dart';
+import 'package:moja_garaza/services/car_services.dart';
 import 'package:moja_garaza/theme.dart';
 import 'package:flutter/material.dart';
-
-import 'models/car.dart' as car;
-import 'models/car.dart';
-
 import './repository/cars_repository.dart';
 
 enum SearchOptions { model, color }
@@ -19,14 +16,6 @@ class _GaragePageState extends State<GaragePage> {
   SearchOptions? _options = SearchOptions.model;
   final TextEditingController _controller = TextEditingController();
 
-  List searchResult = [];
-
-  void initState() {
-    super.initState();
-  }
-
- 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,63 +23,67 @@ class _GaragePageState extends State<GaragePage> {
         title: Text("Garaza"),
       ),
       backgroundColor: blackColor,
-      body: BlocProvider(
-        create: (context) => CarsBloc(FakeCarsRepository())..add(GetCars()),
+      body: BlocProvider<CarsBloc>(
+        create: (_) =>
+            CarsBloc(CarService(FakeCarsRepository()))..add(GetCarsEvent()),
         child: Padding(
           padding: const EdgeInsets.only(top: 30.0, left: 30, right: 30),
-          child: Container(child: BlocBuilder<CarsBloc, CarsState>(
-            builder: (context, state) {
-              if (state is CarsLoading) {
-                return Center(child: CircularProgressIndicator());
-              }
-              if (state is CarsLoaded) {
-                print(state.cars[0]);
-                return Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    searchField(),
-                    pickCategory(),
-                    buildList(state.cars),
-                  ],
-                );
-              }
-              if (state is CarsError) {
-                return Center(
-                    child: Text("This should not happen something is wrong !!",
-                        style: TextStyle(color: Colors.white)));
-              }
-              return Container();
-            },
-          )
-              // child: Column(
-              //   mainAxisSize: MainAxisSize.max,
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     searchField(),
-              //     pickCategory(),
-              //     buildList(),
-              //   ],
-              // ),
-
-              ),
+          child: Container(
+            child: BlocBuilder<CarsBloc, CarsState>(
+              builder: (ctx, state) {
+                if (state is CarsLoading) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (state is CarsLoaded) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      searchField(ctx),
+                      pickCategory(),
+                      buildList(state.cars),
+                    ],
+                  );
+                }
+                if (state is CarsError) {
+                  return Center(
+                    child: Text(
+                      "Nesto je poslo po zlu !!",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }
+                return Container();
+              },
+            ),
+          ),
         ),
       ),
     );
   }
 
   Expanded buildList(List cars) {
+    if (cars.length == 0) {
+      return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            "Kola prema parametrima za pretragu nepostojeca",
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
+      );
+    }
+
     return Expanded(
       child: ListView.builder(
           physics: ScrollPhysics(),
-          itemCount:
-              searchResult.length > 0 ? searchResult.length : cars.length,
+          itemCount: cars.length,
           itemBuilder: (BuildContext context, index) {
-            if (searchResult.length > 0) {
-              return buildCarCard(searchResult, index);
-            } else {
+            if (cars.length > 0) {
               return buildCarCard(cars, index);
             }
+            return Container();
           }),
     );
   }
@@ -126,10 +119,12 @@ class _GaragePageState extends State<GaragePage> {
     );
   }
 
-  TextField searchField() {
+  TextField searchField(BuildContext ctx) {
     return TextField(
       controller: _controller,
-      onSubmitted: _runFilter,
+      onSubmitted: (value) {
+        _submitSearch(ctx, value);
+      },
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.search, color: Colors.white),
         hintText: "Pretraga...",
@@ -189,33 +184,14 @@ class _GaragePageState extends State<GaragePage> {
     );
   }
 
-  void _runFilter(String enteredKeyword) {
-    var results = [];
+  void _submitSearch(BuildContext context, String enteredKeyword) {
     if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
-      results = cars;
-    } else {
-      if (_options == SearchOptions.color) {
-        results = cars
-            .where((car) =>
-                car.color.toLowerCase().contains(enteredKeyword.toLowerCase()))
-            .toList();
-      }
-      if (_options == SearchOptions.model) {
-        results = cars
-            .where((car) => car.carModel
-                .toLowerCase()
-                .contains(enteredKeyword.toLowerCase()))
-            .toList();
-      }
-      // we use the toLowerCase() method to make it case-insensitive
+      context.read<CarsBloc>().add(GetCarsEvent());
     }
-
-    // Refresh the UI
-    setState(() {
-      searchResult = results;
-    });
-
-    enteredKeyword = "";
+    if (_options == SearchOptions.model) {
+      context.read<CarsBloc>().add(SearchCarsByModelEvent(enteredKeyword));
+    } else {
+      context.read<CarsBloc>().add(SearchCarsByColorEvent(enteredKeyword));
+    }
   }
 }

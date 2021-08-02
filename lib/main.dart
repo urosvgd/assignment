@@ -1,4 +1,4 @@
-import 'package:moja_garaza/main_page.dart';
+import 'package:moja_garaza/home_page.dart';
 import 'package:flutter/material.dart';
 import './routes.dart';
 
@@ -18,8 +18,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.grey,
       ),
       onGenerateRoute: RouteGenerator.generateRoute,
-      initialRoute: '/garage',
-      home: MainPage(),
+      initialRoute: '/',
+      home: HomePage(),
     );
   }
 }
