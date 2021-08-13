@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Car extends Equatable {
+class DatabaseHelper extends Equatable {
   final String sId;
   final String carProducer;
   final String carModel;
@@ -8,7 +8,7 @@ class Car extends Equatable {
   final String color;
   final int v;
 
-  Car({
+  DatabaseHelper({
     required this.sId,
     required this.v,
     required this.carProducer,
@@ -17,8 +17,8 @@ class Car extends Equatable {
     required this.plateNumber,
   });
 
-  factory Car.fromJson(Map<String, dynamic> json) {
-    return Car(
+  factory DatabaseHelper.fromJson(Map<String, dynamic> json) {
+    return DatabaseHelper(
       sId: json['_id'] ?? '-1',
       carProducer: json['carProducer'] ?? '-2',
       carModel: json['carModel'] ?? '-3',

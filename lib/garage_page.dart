@@ -25,7 +25,7 @@ class _GaragePageState extends State<GaragePage> {
       backgroundColor: blackColor,
       body: BlocProvider<CarsBloc>(
         create: (_) =>
-            CarsBloc(CarService(FakeCarsRepository()))..add(GetCarsEvent()),
+            CarsBloc(CarService(SqlCarRepository()..fetchCars()))..add(GetCarsEvent()),
         child: Padding(
           padding: const EdgeInsets.only(top: 30.0, left: 30, right: 30),
           child: Container(
@@ -35,6 +35,11 @@ class _GaragePageState extends State<GaragePage> {
                   return Center(child: CircularProgressIndicator());
                 }
                 if (state is CarsLoaded) {
+                  if (state.cars.length == 0) {
+                    return Center(
+                      child: Text("Nula automobila"),
+                    );
+                  }
                   return Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -97,6 +102,7 @@ class _GaragePageState extends State<GaragePage> {
             value: SearchOptions.model,
             groupValue: _options,
             onChanged: (SearchOptions? value) {
+              print(value);
               setState(() {
                 _options = value;
               });
@@ -109,6 +115,7 @@ class _GaragePageState extends State<GaragePage> {
             value: SearchOptions.color,
             groupValue: _options,
             onChanged: (SearchOptions? value) {
+              print(value);
               setState(() {
                 _options = value;
               });

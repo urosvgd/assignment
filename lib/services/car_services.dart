@@ -7,14 +7,16 @@ class CarService {
   CarService(this.carRepository);
 
   Future<List<Car>> getAllCars() async {
-    return await carRepository.fetchCars();
+    List<Car> cars = await carRepository.fetchCars();
+    return cars;
   }
 
   Future<List<Car>> getCarByColor(String color) async {
     List<Car> allCars = await carRepository.fetchCars();
     List<Car> searchedCars = [];
     for (var c in allCars) {
-      if (c.color.toLowerCase() == color.toLowerCase() || c.color.toLowerCase().contains(color)) {
+      if (c.color.toLowerCase() == color.toLowerCase() ||
+          c.color.toLowerCase().contains(color)) {
         searchedCars.add(c);
       }
     }
@@ -22,14 +24,21 @@ class CarService {
     return searchedCars;
   }
 
-  Future<List<Car>> getCarByModel(String model) async {
+   Future<List<Car>> getCarByModel(String model) async {
+     print("### Searched model $model");
+
     List<Car> allCars = await carRepository.fetchCars();
     List<Car> searchedCars = [];
     for (var c in allCars) {
-      if (c.carModel.toLowerCase() == model.toLowerCase() || c.carModel.toLowerCase().contains(model)) {
+      if (c.carModel.toLowerCase() == model.toLowerCase() ||
+          c.carModel.toLowerCase().contains(model)) {
+      print(c);
         searchedCars.add(c);
       }
     }
+
+    print("### Searched Cars $searchedCars");
+
 
     return searchedCars;
   }

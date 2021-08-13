@@ -25,6 +25,8 @@ class CarsBloc extends Bloc<CarsEvent, CarsState> {
         final cars = await carService.getAllCars();
         yield CarsLoaded(cars);
       } catch (error) {
+        print("getAllCars");
+        print(error);
         yield CarsError("Nismo mogli uzeti podatke o vozilima");
       }
     }
@@ -36,6 +38,9 @@ class CarsBloc extends Bloc<CarsEvent, CarsState> {
         filteredCars = await carService.getCarByColor(event.color);
         yield CarsLoaded(filteredCars);
       } catch (error) {
+        print("getCarByColor");
+        print(error);
+
         yield CarsError("Nismo mogli uzeti podatke o vozilima");
       }
     }
@@ -45,6 +50,9 @@ class CarsBloc extends Bloc<CarsEvent, CarsState> {
         filteredCars = await carService.getCarByModel(event.model);
         yield CarsLoaded(filteredCars);
       } catch (error) {
+        print("getCarByModel");
+        print(error);
+
         yield CarsError("Nismo mogli uzeti podatke o vozilima");
       }
     }
