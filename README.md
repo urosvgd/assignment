@@ -1,16 +1,15 @@
 # moja_garaza
 
-A new Flutter project.
+# Functionality
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ 1. Fetch for Cars with http if internet connection
+ 2. Fetch for Cars from sql if there is no internet connection
+ 3.  If connection available check between REST API and local database and save differences
+ 
+ ## Todo
+ 
+ 1. Create UI for Authentication
+ 2. Create functionality for Authentication
+ 3. CRUD for Authenticated user
+ 
+  # **Add more functionality**
