@@ -1,4 +1,4 @@
-import 'package:moja_garaza/home_page.dart';
+import 'package:moja_garaza/screens/home_page.dart';
 import 'package:flutter/material.dart';
 import './routes.dart';
 

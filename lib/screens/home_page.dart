@@ -15,7 +15,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    FakeCarsRepository().fetchCars().then((value) => setState(() {
+    FakeCarRepository().fetchCars().then((value) => setState(() {
           carNumber = value.length;
         }));
     return Scaffold(

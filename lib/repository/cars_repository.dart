@@ -9,7 +9,7 @@ abstract class CarRepository {
   Future<Car> createCar();
 }
 
-class FakeCarsRepository implements CarRepository {
+class FakeCarRepository implements CarRepository {
   final List<Car> cars = [
     Car(
         sId: "1",
@@ -55,13 +55,13 @@ class HttpCarRepository implements CarRepository {
   final client = http.Client();
   final List<Car> cars = [];
 
-  final String baseUrl = "https://assignment-cars-api.herokuapp.com/api";
+  final String baseUrl = "";
 
   @override
   Future<List<Car>> fetchCars() async {
     if (cars.isEmpty) {
       try {
-        var result = await http.get(Uri.parse('$baseUrl/cars'));
+        var result = await http.get(Uri.parse('https://assignment-cars-api.herokuapp.com/api/cars'));
         if (result.statusCode != 200) {
           throw new Exception(
               "Response status code is not 200 check connection");

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moja_garaza/garage_page.dart';
-import 'package:moja_garaza/home_page.dart';
+import 'package:moja_garaza/screens/garage_page.dart';
+import 'package:moja_garaza/screens/home_page.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {

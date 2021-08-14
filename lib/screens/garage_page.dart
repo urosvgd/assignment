@@ -3,7 +3,7 @@ import 'package:moja_garaza/bloc/cars_bloc.dart';
 import 'package:moja_garaza/services/car_services.dart';
 import 'package:moja_garaza/theme.dart';
 import 'package:flutter/material.dart';
-import './repository/cars_repository.dart';
+import '../repository/cars_repository.dart';
 
 enum SearchOptions { model, color }
 
@@ -24,8 +24,12 @@ class _GaragePageState extends State<GaragePage> {
       ),
       backgroundColor: blackColor,
       body: BlocProvider<CarsBloc>(
-        create: (_) =>
-            CarsBloc(CarService(SqlCarRepository()..fetchCars()))..add(GetCarsEvent()),
+        create: (_) => CarsBloc(
+          CarService(
+            onlineRepository: HttpCarRepository(),
+            offlineRepository: SqlCarRepository(),
+          ),
+        )..add(GetCarsEvent()),
         child: Padding(
           padding: const EdgeInsets.only(top: 30.0, left: 30, right: 30),
           child: Container(
