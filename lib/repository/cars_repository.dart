@@ -65,22 +65,30 @@ class HttpCarRepository implements CarRepository {
 
   @override
   Future<List<Car>> fetchCars() async {
-    if (cars.isEmpty) {
-      try {
-        var result = await http.get(
-            Uri.parse('https://assignment-cars-api.herokuapp.com/api/cars'));
-        if (result.statusCode != 200) {
-          throw new Exception(
-              "Response status code is not 200 check connection");
-        }
-
-        final json = jsonDecode(result.body);
-        (json['results'] as List).forEach((element) {
-          cars.add(Car.fromJson(element, changeId: false));
-        });
-      } catch (error) {
-        print(error);
+    List<Car> newCars = [];
+    try {
+      var result = await http
+          .get(Uri.parse('https://assignment-cars-api.herokuapp.com/api/cars'));
+      if (result.statusCode != 200) {
+        throw new Exception("Response status code is not 200 check connection");
       }
+
+      final json = jsonDecode(result.body);
+
+      // print("json['results'] from REPOSITORY");
+      // print(json['results'].length);
+
+      (json['results'] as List).forEach((element) {
+        newCars.add(Car.fromJson(element, changeId: false));
+      });
+
+      for (var c in newCars) {
+        if (!cars.contains(c)) {
+          cars.add(c);
+        }
+      }
+    } catch (error) {
+      print(error);
     }
 
     return cars;

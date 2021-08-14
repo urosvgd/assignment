@@ -13,16 +13,20 @@ class CarService {
 
   Future<List<Car>> getAllCars(bool isConnected) async {
     late List<Car> cars = [];
-    List<Car> offlineCars = await offlineRepository!.fetchCars();
-
+    print(isConnected);
     if (isConnected) {
       List<Car> carDifference = [];
       cars = await onlineRepository!.fetchCars();
+      List<Car> offlineCars = await offlineRepository!.fetchCars();
+      
       carDifference = _getCarDifference(cars, offlineCars);
       _saveCarDifference(carDifference);
     } else {
       cars = await offlineRepository!.fetchCars();
-    }
+    }      
+    
+    print("CARS LENGTH FROM SERVICE  ${cars.length}");
+
     return cars;
   }
 
