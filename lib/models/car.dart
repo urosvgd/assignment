@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Car extends Equatable {
-  final String sId;
+  String serialNumber;
   final String carProducer;
   final String carModel;
   final String plateNumber;
@@ -9,7 +9,7 @@ class Car extends Equatable {
   final int v;
 
   Car({
-    required this.sId,
+    required this.serialNumber,
     required this.v,
     required this.carProducer,
     required this.carModel,
@@ -17,9 +17,9 @@ class Car extends Equatable {
     required this.plateNumber,
   });
 
-  factory Car.fromJson(Map<String, dynamic> json) {
+  factory Car.fromJson(Map<String, dynamic> json, { bool changeId: true }) {
     return Car(
-      sId: json['_id'] ?? '-1',
+      serialNumber: json[changeId ? 'serialNumber' :'_id'] ?? '-1',
       carProducer: json['carProducer'] ?? '-2',
       carModel: json['carModel'] ?? '-3',
       color: json['color'] ?? '-4',
@@ -30,7 +30,7 @@ class Car extends Equatable {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
+    data['serialNumber'] = this.serialNumber;
     data['carProducer'] = this.carProducer;
     data['carModel'] = this.carModel;
     data['color'] = this.color;
@@ -42,7 +42,7 @@ class Car extends Equatable {
 
   @override
   List<Object> get props => [
-        sId,
+        serialNumber,
         carProducer,
         carModel,
         color,
@@ -50,8 +50,8 @@ class Car extends Equatable {
         v,
       ];
 
-  // @override
-  // String toString() {
-  //   return 'id: $sId, car producer: $carProducer, car model: $carModel, color: $color, plate number: $plateNumber, v: $v';
-  // }
+  @override
+  String toString() {
+    return 'id: $serialNumber, car producer: $carProducer, car model: $carModel, color: $color, plate number: $plateNumber, v: $v';
+  }
 }

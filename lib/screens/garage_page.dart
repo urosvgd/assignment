@@ -18,30 +18,37 @@ class _GaragePageState extends State<GaragePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Garaza"),
-      ),
-      backgroundColor: blackColor,
-      body: BlocProvider<CarsBloc>(
-        create: (_) => CarsBloc(
-          CarService(
-            onlineRepository: HttpCarRepository(),
-            offlineRepository: SqlCarRepository(),
-          ),
-        )..add(GetCarsEvent()),
-        child: Padding(
+    return BlocProvider<CarsBloc>(
+      create: (_) => CarsBloc(
+        CarService(
+          onlineRepository: HttpCarRepository(),
+          offlineRepository: SqlCarRepository(),
+        ),
+      )..add(GetCarsEvent()),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Garaza"),
+        ),
+        backgroundColor: blackColor,
+        body: Padding(
           padding: const EdgeInsets.only(top: 30.0, left: 30, right: 30),
           child: Container(
             child: BlocBuilder<CarsBloc, CarsState>(
               builder: (ctx, state) {
                 if (state is CarsLoading) {
-                  return Center(child: CircularProgressIndicator());
+                  return RefreshIndicator(
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      onRefresh: () => _onRefresh(ctx));
                 }
                 if (state is CarsLoaded) {
                   if (state.cars.length == 0) {
-                    return Center(
-                      child: Text("Nula automobila"),
+                    return RefreshIndicator(
+                      onRefresh: () => _onRefresh(ctx),
+                      child: Center(
+                        child: Text("Nula automobila"),
+                      ),
                     );
                   }
                   return Column(
@@ -50,7 +57,7 @@ class _GaragePageState extends State<GaragePage> {
                     children: [
                       searchField(ctx),
                       pickCategory(),
-                      buildList(state.cars),
+                      buildList(ctx, state.cars),
                     ],
                   );
                 }
@@ -71,7 +78,12 @@ class _GaragePageState extends State<GaragePage> {
     );
   }
 
-  Expanded buildList(List cars) {
+  Future<void> _onRefresh(BuildContext ctx) async {
+    BlocProvider.of<CarsBloc>(ctx).add(GetCarsEvent());
+    return;
+  }
+
+  Widget buildList(BuildContext ctx, List cars) {
     if (cars.length == 0) {
       return Expanded(
         child: Padding(
@@ -85,15 +97,19 @@ class _GaragePageState extends State<GaragePage> {
     }
 
     return Expanded(
-      child: ListView.builder(
-          physics: ScrollPhysics(),
-          itemCount: cars.length,
-          itemBuilder: (BuildContext context, index) {
-            if (cars.length > 0) {
-              return buildCarCard(cars, index);
-            }
-            return Container();
-          }),
+      flex: 1,
+      child: RefreshIndicator(
+        onRefresh: () => _onRefresh(ctx),
+        child: ListView.builder(
+            physics: AlwaysScrollableScrollPhysics(),
+            itemCount: cars.length,
+            itemBuilder: (BuildContext context, index) {
+              if (cars.length > 0) {
+                return buildCarCard(cars, index);
+              }
+              return Container();
+            }),
+      ),
     );
   }
 

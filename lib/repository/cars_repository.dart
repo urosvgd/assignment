@@ -1,32 +1,32 @@
 import 'dart:convert';
 
-import 'package:moja_garaza/data/database_helperV2.dart';
+import 'package:moja_garaza/data/database_helper.dart';
 import 'package:moja_garaza/models/car.dart';
 import 'package:http/http.dart' as http;
 
 abstract class CarRepository {
   Future<List<Car>> fetchCars();
-  Future<Car> createCar();
+  Future<int> addCar(Car car);
 }
 
 class FakeCarRepository implements CarRepository {
   final List<Car> cars = [
     Car(
-        sId: "1",
+        serialNumber: "1",
         v: 0,
         carProducer: "BMW",
         carModel: "BMW",
         color: "Crveno",
         plateNumber: "BG 333 222"),
     Car(
-        sId: "2",
+        serialNumber: "2",
         v: 0,
         carProducer: "Audi",
         carModel: "Audi e-tron",
         color: "Zeleno",
         plateNumber: "BG 333 222"),
     Car(
-        sId: "3",
+        serialNumber: "3",
         v: 0,
         carProducer: "Bugatti",
         carModel: "16/4 Veyron Concept",
@@ -49,6 +49,12 @@ class FakeCarRepository implements CarRepository {
     // TODO: implement createCar
     throw UnimplementedError();
   }
+
+  @override
+  Future<int> addCar(Car car) {
+    // TODO: implement addCar
+    throw UnimplementedError();
+  }
 }
 
 class HttpCarRepository implements CarRepository {
@@ -61,7 +67,8 @@ class HttpCarRepository implements CarRepository {
   Future<List<Car>> fetchCars() async {
     if (cars.isEmpty) {
       try {
-        var result = await http.get(Uri.parse('https://assignment-cars-api.herokuapp.com/api/cars'));
+        var result = await http.get(
+            Uri.parse('https://assignment-cars-api.herokuapp.com/api/cars'));
         if (result.statusCode != 200) {
           throw new Exception(
               "Response status code is not 200 check connection");
@@ -69,7 +76,7 @@ class HttpCarRepository implements CarRepository {
 
         final json = jsonDecode(result.body);
         (json['results'] as List).forEach((element) {
-          cars.add(Car.fromJson(element));
+          cars.add(Car.fromJson(element, changeId: false));
         });
       } catch (error) {
         print(error);
@@ -84,6 +91,12 @@ class HttpCarRepository implements CarRepository {
     // TODO: implement createCar
     throw UnimplementedError();
   }
+
+  @override
+  Future<int> addCar(Car car) {
+    // TODO: implement addCar
+    throw UnimplementedError();
+  }
 }
 
 class SqlCarRepository implements CarRepository {
@@ -92,7 +105,7 @@ class SqlCarRepository implements CarRepository {
   @override
   Future<List<Car>> fetchCars() async {
     List<Car> cars = [];
-    
+
     var allRows = await databaseHelper.queryAllRows();
 
     (allRows as List).forEach((element) {
@@ -103,9 +116,8 @@ class SqlCarRepository implements CarRepository {
   }
 
   @override
-  Future<Car> createCar() {
-    // TODO: implement createCar
-    throw UnimplementedError();
+  Future<int> addCar(Car car) {
+    return databaseHelper.insert(car.toJson());
   }
 }
 

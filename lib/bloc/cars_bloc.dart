@@ -30,7 +30,6 @@ class CarsBloc extends Bloc<CarsEvent, CarsState> {
         final cars = await carService.getAllCars(isConnected);
         yield CarsLoaded(cars);
       } catch (error) {
-        print("getAllCars");
         print(error);
         yield CarsError("Nismo mogli uzeti podatke o vozilima");
       }

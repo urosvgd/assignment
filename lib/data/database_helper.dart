@@ -1,53 +1,95 @@
 import 'dart:io';
 
-import 'package:moja_garaza/models/car.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DatabaseHelper {
-  static const String TABLE_NAME = 'cars';
-  static final _dbName = "cars.db";
+
+  static final _databaseName = "cars.db";
+  static final _databaseVersion = 1;
+
+  static final table = 'cars';
+
+  static final columnId = 'id';
+  static final columnSerialNumber = 'serialNumber';
+  static final columnCarProducer = 'carProducer';
+  static final columnColor = 'color';
+  static final columnCarModel = 'carModel';
+  static final columnPlateNumber = 'plateNumber';
+  static final columnV = '__v';
+
+  // make this a singleton class
   DatabaseHelper._privateConstructor();
-
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
-  static late Database? _database;
 
+  // only have a single app-wide reference to the database
+  static Database? _database;
   Future<Database?> get database async {
     if (_database != null) return _database;
-    // Instantiate the database only when it's not been initialized yet.
+    // lazily instantiate the db the first time it is accessed
     _database = await _initDatabase();
     return _database;
   }
 
+  // this opens the database (and creates it if it doesn't exist)
   _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, _dbName);
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
-    );
-  }
-  // Creates the database structure
-  Future _onCreate(
-    Database db,
-    int version,
-  ) async {
-    await db.execute('''
-          CREATE TABLE Cars (
-            id TEXT PRIMARY KEY,
-            carProducer TEXT NOT NULL,
-            carModel TEXT NOT NULL,
-            color TEXT NOT NULL,
-            plateNumber TEXT NOT NULL,
-            v INTEGER NOT NULL
-          )
-          ''');
+    String path = join(documentsDirectory.path, _databaseName);
+    return await openDatabase(path,
+        version: _databaseVersion,
+        onCreate: _onCreate);
   }
 
-   Future<int> insertCar(Car car) async {
-    return await _database!.insert(TABLE_NAME, car.toJson());
+  // SQL code to create the database table
+  Future _onCreate(Database db, int version) async {
+    await db.execute('''CREATE TABLE $table (
+            $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+            $columnSerialNumber TEXT NOT NULL,
+            $columnCarProducer TEXT NOT NULL,
+            $columnColor TEXT NOT NULL,
+            $columnCarModel TEXT NOT NULL,
+            $columnPlateNumber TEXT NOT NULL,
+            $columnV INTEGER 
+          )''');
   }
 
+  // Helper methods
+
+  // sours a row in the database where each key in the Map is a column name
+  // and the value is the column value. The return value is the id of the
+  // inserted row.
+  Future<int> insert(Map<String, dynamic> row) async {
+    Database? db = await instance.database;
+    return await db!.insert(table, row);
+  }
+
+  // All of the rows are returned as a list of maps, where each map is
+  // a key-value list of columns.
+  Future<List<Map<String, dynamic>>> queryAllRows() async {
+    Database? db = await instance.database;
+    return await db!.query(table);
+  }
+
+  // All of the methods (insert, query, update, delete) can also be done using
+  // raw SQL commands. This method uses a raw query to give the row count.
+  Future<int?> queryRowCount() async {
+    Database? db = await instance.database;
+    return Sqflite.firstIntValue(await db!.rawQuery('SELECT COUNT(*) FROM $table'));
+  }
+
+  // We are assuming here that the id column in the map is set. The other
+  // column values will be used to update the row.
+  Future<int> update(Map<String, dynamic> row) async {
+    Database? db = await instance.database;
+    int id = row[columnId];
+    return await db!.update(table, row, where: '$columnId = ?', whereArgs: [id]);
+  }
+
+  // Deletes the row specified by the id. The number of affected rows is
+  // returned. This should be 1 as long as the row exists.
+  Future<int> delete(String id) async {
+    Database? db = await instance.database;
+    return await db!.delete(table, where: '$columnId = ?', whereArgs: [id]);
+  }
 }
